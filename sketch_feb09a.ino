@@ -112,7 +112,7 @@ void controlLED(int time){
   if(time % interval <= 10){//誤差を10msだけ許容する
     if(!(lockedLED)){
       if(count<arySize){
-      Blink();
+        Blink();
       }
       else{
         OFF(LED);
