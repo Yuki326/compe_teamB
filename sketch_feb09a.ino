@@ -26,6 +26,8 @@ int pattern4[] = {//動作確認用
 
 #define MOTER 2//使用するピン番号 ★
 #define LED A5 //★
+#define INPUT_SET 5 //★
+#define START_BUTTON 6//★
 
 /*点滅パターン 1がON、0がOFF */
 #define CYCLE 10 //pwmの１周期にかける時間　単位 ms ★
@@ -42,6 +44,19 @@ int arySize = 0;//初期化
 int interval = 0;//初期化
 unsigned count = 0;
 bool lockedLED = false;
+bool startFlag = false;
+int prevTime = 0;
+bool state = false;
+bool oldValStart = false;
+bool valStart = false;
+void initialize(){
+  OFF(MOTER);
+  OFF(LED);
+  count = 0;
+  power = 0;
+  lockedLED = false;
+  prevTime = (unsigned long)millis();
+}
 void ON(int pin){
   digitalWrite(pin, HIGH);
 }
@@ -69,6 +84,9 @@ void setup()
 {
   pinMode(MOTER, OUTPUT);
   pinMode(LED, OUTPUT);
+  pinMode(INPUT_SET, INPUT);
+  pinMode(START_BUTTON, INPUT);
+
   switch(SELECT){
     case 1:
       arySize = sizeof(pattern1)/sizeof(int);
@@ -112,7 +130,7 @@ void controlLED(int time){
   if(time % interval <= 10){//誤差を10msだけ許容する
     if(!(lockedLED)){
       if(count<arySize){
-      Blink();
+        Blink();
       }
       else{
         OFF(LED);
@@ -130,15 +148,27 @@ void controlLED(int time){
 void loop()
 {
   
-  unsigned long time = (unsigned long)millis();//プログラム開始時点からの経過時間を取得　※約50日でオーバーフローし0に戻るので注意
-
-  if(time <= MOTERTIME){
-   controlMoter(time); //モータをpwm制御
+  unsigned long time = (unsigned long)millis()-prevTime;//スタートボタン押下からの経過時間を取得　※約50日でオーバーフローし0に戻るので注意
+  valStart =  digitalRead(START_BUTTON);
+  if(valStart == HIGH && oldValStart == LOW){
+    state = !state;
+    initialize();
+  }
+  oldValStart = valStart;
+  
+  if(state){
+    if(time <= MOTERTIME){
+     controlMoter(time); //モータをpwm制御
+    }
+    else{
+      OFF(MOTER);
+      controlLED(time-MOTERTIME);// LEDのONOFFをパターンに基づいて指定
+    }
   }
   else{
-    OFF(MOTER);
-    controlLED(time-MOTERTIME);// LEDのONOFFをパターンに基づいて指定
+    
   }
+  
   
   delay(1);
 }
