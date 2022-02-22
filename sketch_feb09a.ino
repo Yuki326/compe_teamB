@@ -19,10 +19,11 @@ int pattern4[] = {//動作確認用
   0,1,0,1,0,0,1,0,0,
   0,1,0,1,0,0,1,1,1,1,1,1,
   };
+int* pattern[] = {&pattern1[0],&pattern2[0],&pattern3[0],&pattern4[0]};
 #define INTERVAL1 1000//1文字にかける時間 単位：ms ★
 #define INTERVAL2 500//単位：ms ★
 #define INTERVAL3 300//単位：ms ★
-#define INTERVAL4 150//単位：ms ★
+#define INTERVAL4 120//単位：ms ★
 
 #define MOTER 2//使用するピン番号 ★
 #define LED A5 //★
@@ -48,25 +49,19 @@ void ON(int pin){
 void OFF(int pin){
   digitalWrite(pin, LOW);
 }
-void _Blink(int ary[]){
-  
-  if(ary[count]==1){
+
+void Blink(){
+  if(pattern[SELECT-1][count]==1){
+
     ON(LED);
   }
   else{
     OFF(LED);
   }
 }
-void Blink(){
-  switch(SELECT){
-    case 1:_Blink(pattern1);break;
-    case 2:_Blink(pattern2);break;
-    case 3:_Blink(pattern3);break;
-    case 4:_Blink(pattern4);break;
-  }
-}
 void setup()
 {
+  Serial.begin(9600);  
   pinMode(MOTER, OUTPUT);
   pinMode(LED, OUTPUT);
   switch(SELECT){
