@@ -1,13 +1,13 @@
 //--------/
-//   設定
+//   設定 ★がついてる場所の値を変更して調整をお願いします。
 //---------/
-#define SELECT 4//ここでパターンを指定
+#define SELECT 4//ここでパターンを指定 ★
 /*点滅パターン 1がON、0がOFF */
 #define PATTERN_NUM 3
 
-int pattern1[] = {0,1,0,1,0,1,1,0,1,0,0,0,0};
-int pattern2[] = {0,0,1,1,0,1,1,0,1,1,1,1,0,0,1,1,0,1,1,0,1,0,0,0};
-int pattern3[] = {1,1,1,0,1,1,1,0,0,0,1,1,1,0,1,1,1,0,1,1,1,0,0,0,1,1,1,0,1,0,0,0,1,1,1,0,1,1,1,0,1,1,1};
+int pattern1[] = {0,1,0,1,0,1,1,0,1,0,0,0,0}; ★
+int pattern2[] = {0,0,1,1,0,1,1,0,1,1,1,1,0,0,1,1,0,1,1,0,1,0,0,0}; ★
+int pattern3[] = {1,1,1,0,1,1,1,0,0,0,1,1,1,0,1,1,1,0,1,1,1,0,0,0,1,1,1,0,1,0,0,0,1,1,1,0,1,1,1,0,1,1,1}; ★
 int pattern4[] = {//動作確認用
   1,0,1,0,1,0,1,0,1,0,0,0,0,
   1,0,1,0,1,0,1,0,1,0,0,0,0,
@@ -16,26 +16,26 @@ int pattern4[] = {//動作確認用
   1,0,1,0,1,0,1,0,1,0,0,0,0,
   1,0,1,0,1,0,1,0,1,0,0,0,0,
   };
-#define INTERVAL1 1000//1文字にかける時間 単位：ms
-#define INTERVAL2 500//単位：ms
-#define INTERVAL3 300//単位：ms
-#define INTERVAL4 150//単位：ms
+#define INTERVAL1 1000//1文字にかける時間 単位：ms ★
+#define INTERVAL2 500//単位：ms ★
+#define INTERVAL3 300//単位：ms ★
+#define INTERVAL4 150//単位：ms ★
 
-#define MOTER 2//使用するピン番号
-#define LED A5
+#define MOTER 2//使用するピン番号 ★
+#define LED A5 ★
 
 /*点滅パターン 1がON、0がOFF */
-#define CYCLE 10 //pwmの１周期にかける時間　単位 ms
-#define MAXPOWER 10//pwmの最大出力時に１周期のうち何m秒をONにするか
-#define KASOKUTIME 4000//加速,減速にかける時間 ms
+#define CYCLE 10 //pwmの１周期にかける時間　単位 ms ★
+#define MAXPOWER 10//pwmの最大出力時に１周期のうち何m秒をONにするか ★
+#define KASOKUTIME 4000//加速,減速にかける時間 ms ★
 int KASOKUCYCLE = KASOKUTIME/MAXPOWER;
-#define MOTERTIME 10000 //モータの稼働時間 単位ms
-#define TIMELIMIT 30000 //制限時間（プログラム停止用）
+#define MOTERTIME 10000 //モータの稼働時間 単位ms ★
+#define TIMELIMIT 30000 //制限時間（プログラム停止用）★
 
 //-------------------/
 //  制御
 //------------------/
-int power = 0;
+int power = 0;//初期化
 int arySize = 0;//初期化
 int interval = 0;//初期化
 int count = 0;
@@ -65,8 +65,6 @@ void Blink(){
 }
 void setup()
 {
-  int signal_speed = 9600;
-  Serial.begin(signal_speed);
   pinMode(MOTER, OUTPUT);
   pinMode(LED, OUTPUT);
   switch(SELECT){
@@ -112,7 +110,7 @@ void controlLED(int time){
   if(time % interval <= 10){//誤差を10msだけ許容する
     if(!(lockedLED)){
       if(count<arySize){
-        Blink();
+      Blink();
       }
       else{
         OFF(LED);
@@ -130,16 +128,15 @@ void controlLED(int time){
 void loop()
 {
   
-  
-  int time = int(millis());
+  int time = int(millis());//プログラム開始時点からの経過時間を取得
 
   if(time <= MOTERTIME){
-   controlMoter(time); 
+   controlMoter(time); //モータをpwm制御
   }
   else{
     OFF(MOTER);
-    controlLED(time-MOTERTIME);
-    while(time > TIMELIMIT){
+    controlLED(time-MOTERTIME);// LEDのONOFFをパターンに基づいて指定
+    while(time > TIMELIMIT){//動作停止
       OFF(LED);
       delay(1);
     }
