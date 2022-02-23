@@ -72,7 +72,7 @@ void controlMoter(int time){
   }
 }
 void controlLED(int time){
-  if(time % interval[SELECT-1] <= 5){//誤差を5msだけ許容
+  if(time % interval[SELECT-1] <= 3){//誤差を3msだけ許容
     if(!(lockedLED)){
       Blink();
       count++;
@@ -92,9 +92,10 @@ void loop()
     time = (unsigned long)millis();//プログラム開始時点からの経過時間を取得　※約50日でオーバーフローし0に戻るので注意
     controlMoter(time); //モータをpwm制御
   }
+  OFF(MOTER);
   while(1){
     time = (unsigned long)millis();//プログラム開始時点からの経過時間を取得　※約50日でオーバーフローし0に戻るので注意
-    OFF(MOTER);
     controlLED(time-MOTERTIME);// LEDのONOFFをパターンに基づいて指定
+//    Serial.print(time%10);
   }
 }
