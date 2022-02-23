@@ -96,3 +96,9 @@ void Blink(){
   }
 }
 
+void ON(int pin){
+  digitalWrite(pin, HIGH);
+}
+void OFF(int pin){
+  digitalWrite(pin, LOW);
+}
