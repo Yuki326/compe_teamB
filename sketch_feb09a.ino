@@ -3,7 +3,7 @@
 //---------/
 #define SELECT 3//ここでパターンを指定 // ★
 
-#define MOTER 2//使用するピン番号 ★
+#define MOTER A5//使用するピン番号 ★
 #define LED A5 //★
 
 /*点滅パターン 1がON、0がOFF */
@@ -21,7 +21,7 @@ int interval[] = {1000,500,300,300};
 #define KASOKUTIME 4000//加速,減速にかける時間 ms ★
 int KASOKUCYCLE = KASOKUTIME/MAXPOWER;
 #define MOTERTIME 10000 //モータの稼働時間 単位ms ★
-
+#define TIMELIMIT 30000
 //-------------------/
 //  制御
 //------------------/
@@ -45,20 +45,18 @@ void loop()
     time = (unsigned long)millis();//プログラム開始時点からの経過時間を取得　※約50日でオーバーフローし0に戻るので注意
     controlMoter(time); //モータをpwm制御
   }
-  OFF(MOTER);
-  while(1){
-    time = (unsigned long)millis();//プログラム開始時点からの経過時間を取得　※約50日でオーバーフローし0に戻るので注意
-    controlLED(time-MOTERTIME);// LEDのONOFFをパターンに基づいて指定
+  digitalWrite(MOTER,LOW);
+  while(time <= TIMELIMIT){
+    time = (unsigned long)millis();//プログラム開始時点からの経過時間を取得
+    digitalWrite(LED, (pattern[SELECT-1]>>(time-MOTERTIME)/interval[SELECT-1])&1);
 //    Serial.print(time%10);
+  }
+  while(1){
+    delay(1);
   }
 }
 void controlMoter(int time){
-  if(time % CYCLE < power){
-    ON(MOTER);
-  }
-  else{
-    OFF(MOTER);
-  }
+  digitalWrite(MOTER,time % CYCLE < power);
   if(time % KASOKUCYCLE == 0){
     if(time <= KASOKUTIME){
       if(power < MAXPOWER){
@@ -71,34 +69,4 @@ void controlMoter(int time){
       }
     }
   }
-}
-
-void controlLED(int time){
-  if(time % interval[SELECT-1] <= 3){//誤差を3msだけ許容
-    if(!(lockedLED)){
-      Blink();
-      count++;
-      lockedLED = true;
-    }
-  }
-  else{
-    lockedLED = false;
-  }
-}
-
-void Blink(){
-
-  if((pattern[SELECT-1]>>count)&1){
-    ON(LED);
-  }
-  else{
-    OFF(LED);
-  }
-}
-
-void ON(int pin){
-  digitalWrite(pin, HIGH);
-}
-void OFF(int pin){
-  digitalWrite(pin, LOW);
 }
