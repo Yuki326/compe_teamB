@@ -1,10 +1,16 @@
 //--------/
 //   設定 ★がついてる場所の値を変更して調整をお願いします。
 //---------/
-#define SELECT 3//ここでパターンを指定 // ★
 
 #define MOTER A5//使用するピン番号 ★
 #define LED A5 //★
+
+#define MOTERTIME 10000 //モータの稼働時間 単位ms ★
+#define TIMELIMIT 30000
+
+/* LED設定 */
+
+#define SELECT 3//ここでパターンを指定 // ★
 
 /*点滅パターン 1がON、0がOFF */
 int64_t pattern[] ={//64bitまで格納
@@ -16,23 +22,21 @@ int64_t pattern[] ={//64bitまで格納
 
 int interval[] = {1000,500,300,300};
 
+/* モーター設定 */
+
 #define CYCLE 10 //pwmの１周期にかける時間　単位 ms ★
 #define MAXPOWER 10//pwmの最大出力時に１周期のうち何m秒をONにするか ★
 #define KASOKUTIME 4000//加速,減速にかける時間 ms ★
 int KASOKUCYCLE = KASOKUTIME/MAXPOWER;
-#define MOTERTIME 10000 //モータの稼働時間 単位ms ★
-#define TIMELIMIT 30000
+
 //-------------------/
 //  制御
 //------------------/
 int power = 0;//初期化
-int arySize = 0;//初期化
-unsigned count = 0;
-bool lockedLED = false;
 
 void setup()
 {
-  Serial.begin(9600);  
+//  Serial.begin(9600);  
   pinMode(MOTER, OUTPUT);
   pinMode(LED, OUTPUT);
 }
