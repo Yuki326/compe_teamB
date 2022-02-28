@@ -1,9 +1,10 @@
 //--------/
 //   設定 ★がついてる場所の値を変更して調整をお願いします。
 //---------/
+#include <MsTimer2.h>
 
-#define MOTER A5//使用するピン番号 ★
-#define LED A5 //★
+#define MOTER 13//使用するピン番号 ★
+#define LED 2 //★
 
 #define MOTERTIME 10000 //モータの稼働時間 単位ms ★
 #define TIMELIMIT 30000
@@ -25,7 +26,7 @@ int interval[] = {1000,500,300,300};
 /* モーター設定 */
 
 #define CYCLE 10 //pwmの１周期にかける時間　単位 ms ★
-#define MAXPOWER 10//pwmの最大出力時に１周期のうち何m秒をONにするか ★
+#define MAXPOWER 5//pwmの最大出力時に１周期のうち何m秒をONにするか ★
 #define KASOKUTIME 4000//加速,減速にかける時間 ms ★
 int KASOKUCYCLE = KASOKUTIME/MAXPOWER;
 
@@ -33,12 +34,14 @@ int KASOKUCYCLE = KASOKUTIME/MAXPOWER;
 //  制御
 //------------------/
 int power = 0;//初期化
-
+int counter = 0;
 void setup()
 {
 //  Serial.begin(9600);  
   pinMode(MOTER, OUTPUT);
   pinMode(LED, OUTPUT);
+  MsTimer2::set(1, controlMoter); 
+  MsTimer2::start();
 }
 
 void loop()
@@ -46,10 +49,10 @@ void loop()
   unsigned long time = 0;
 
   while(time <= MOTERTIME){
-    time = (unsigned long)millis();//プログラム開始時点からの経過時間を取得　※約50日でオーバーフローし0に戻るので注意
-    controlMoter(time); //モータをpwm制御
   }
+  MsTimer2::stop();
   digitalWrite(MOTER,LOW);
+  
   while(time <= TIMELIMIT){
     time = (unsigned long)millis();//プログラム開始時点からの経過時間を取得
     digitalWrite(LED, (pattern[SELECT-1]>>(time-MOTERTIME)/interval[SELECT-1])&1);
@@ -59,18 +62,21 @@ void loop()
     delay(1);
   }
 }
-void controlMoter(int time){
-  digitalWrite(MOTER,time % CYCLE < power);
-  if(time % KASOKUCYCLE == 0){
-    if(time <= KASOKUTIME){
+void controlMoter(){
+  digitalWrite(MOTER,counter % CYCLE < power);
+  if(counter % KASOKUCYCLE == 0){
+    if(counter <= KASOKUTIME){
       if(power < MAXPOWER){
         power++;
+//      analogWrite(MOTER,power*25);
       }
     }
-    if(MOTERTIME - time <= KASOKUTIME){
+    if(MOTERTIME - counter <= KASOKUTIME){
       if(power > 0){
         power --;
+//        analogWrite(MOTER,power*25);
       }
     }
   }
+  counter++;
 }
