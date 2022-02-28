@@ -41,14 +41,15 @@ void setup()
   pinMode(MOTER, OUTPUT);
   pinMode(LED, OUTPUT);
   MsTimer2::set(1, controlMoter); 
-  MsTimer2::start();
 }
 
 void loop()
 {
   unsigned long time = 0;
-
+  
+  MsTimer2::start();
   while(time <= MOTERTIME){
+    time = (unsigned long)millis();//プログラム開始時点からの経過時間を取得
   }
   MsTimer2::stop();
   digitalWrite(MOTER,LOW);
